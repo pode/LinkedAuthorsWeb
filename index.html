@@ -38,7 +38,7 @@ function showWorks(author) {
 			// alert(json.results.bindings[0].title.value);
 			$.each(json.results.bindings, function(i, n) {
 				var item = json.results.bindings[i];
-				$('#workslist').append('<li class="work" id="work' + i + '" onClick="showExpressions(\'work' + i + '\', \'' + item.work.value + '\');">' + item.title.value + '</li>');
+				$('#workslist').append('<li><span class="work" id="work' + i + '" onClick="showExpressions(\'work' + i + '\', \'' + item.work.value + '\');">' + item.title.value + '</span></li>');
 			});
 		} else {
 			alert('Something went wrong...');
@@ -48,30 +48,49 @@ function showWorks(author) {
 }
 
 function showExpressions(elemid, workuri) {
-	// alert(s);
-	var url='http://bibpode.no/rdfstore/endpoint.php?query=PREFIX+pode%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fvocabulary%23%3E%0D%0APREFIX+pode_lf%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Flf%2F%3E+%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0D%0APREFIX+frbr%3A+%3Chttp%3A%2F%2Fpurl.org%2Fvocab%2Ffrbr%2Fcore%23%3E%0D%0APREFIX+person%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fperson%2F%3E+%0D%0APREFIX+work%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fwork%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Flanguage+%3Fformat+WHERE+{%0D%0A%3Fexpression+a+frbr%3AExpression+.%0D%0A%3Fexpression+frbr%3ArealizationOf+%3C' + workuri + '%3E+.%0D%0A%3Fexpression+dct%3Alanguage+%3Flanguage+.%0D%0A%3Fexpression+dct%3Aformat+%3Fformat+.%0D%0A}%0D%0AORDER+BY+%3Flanguage&jsonp=?'
 	
-	var params = { 'output': 'json' };
-
-	$.getJSON(url, params, function(json, status) {
-		if (json.results.bindings){
-			// alert(json.results.bindings[0].title.value);
-			var out = '<ul>';
-			$.each(json.results.bindings, function(i, n) {
-				var item = json.results.bindings[i];
-				var idattribute = elemid + 'expression' + i;
-				out = out + '<li id="' + idattribute + '" class="expression" onClick="showManifestations(\'' + idattribute + '\', \'' + workuri + '\', \'' + item.language.value + '\', \'' + item.format.value + '\');">' + item.language.value + ' ' + item.format.value + '</li>';
-			});
-			var out = out + '</ul>';
-			$('#' + elemid).append(out);
-			// Remove the onClick attribute
-			$('#' + elemid).removeAttr("onClick");
-			$('#' + elemid).addClass("expanded");
-		} else {
-			alert('Something went wrong...');	
+	// Check to see if this work already has (hidden) children attached, if so show them
+	if ($('#' + elemid).siblings().length > 0) {
+		
+		// Do nothing if the clicked work already has visible children
+		if ($('#' + elemid).siblings('ul').is(":visible")) {
+			return;
 		}
-	});
+		
+		// Hide all "open" works
+		$('.work').siblings().hide('slow');
+		// Show this one
+		$('#' + elemid).siblings().show('slow');
+		
+	} else {
+
+		var url='http://bibpode.no/rdfstore/endpoint.php?query=PREFIX+pode%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fvocabulary%23%3E%0D%0APREFIX+pode_lf%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Flf%2F%3E+%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0D%0APREFIX+frbr%3A+%3Chttp%3A%2F%2Fpurl.org%2Fvocab%2Ffrbr%2Fcore%23%3E%0D%0APREFIX+person%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fperson%2F%3E+%0D%0APREFIX+work%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fwork%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Flanguage+%3Fformat+WHERE+{%0D%0A%3Fexpression+a+frbr%3AExpression+.%0D%0A%3Fexpression+frbr%3ArealizationOf+%3C' + workuri + '%3E+.%0D%0A%3Fexpression+dct%3Alanguage+%3Flanguage+.%0D%0A%3Fexpression+dct%3Aformat+%3Fformat+.%0D%0A}%0D%0AORDER+BY+%3Flanguage&jsonp=?'
+		
+		var params = { 'output': 'json' };
 	
+		$.getJSON(url, params, function(json, status) {
+			if (json.results.bindings){
+				// alert(json.results.bindings[0].title.value);
+				var out = '<ul>';
+				$.each(json.results.bindings, function(i, n) {
+					var item = json.results.bindings[i];
+					var idattribute = elemid + 'expression' + i;
+					out = out + '<li><span id="' + idattribute + '" class="expression" onClick="showManifestations(\'' + idattribute + '\', \'' + workuri + '\', \'' + item.language.value + '\', \'' + item.format.value + '\');">' + item.language.value + ' ' + item.format.value + '</span></li>';
+				});
+				var out = out + '</ul>';
+				// Hide all "open" works
+				$('.work').siblings().hide('slow');
+				// Insert the output after the span that was clicked
+				$('#' + elemid).after(out);
+				// Remove the onClick attribute
+				// $('#' + elemid).removeAttr("onClick");
+				// $('#' + elemid).addClass("expanded");
+			} else {
+				alert('Something went wrong...');	
+			}
+		});
+	
+	}	
 }
 
 function showManifestations(elemid, workuri, languageuri, formaturi) {
@@ -124,7 +143,7 @@ ORDER BY ?title ?issued
 				out = out + '</li>';
 			});
 			var out = out + '</ul>';
-			$('#' + elemid).append(out);
+			$('#' + elemid).after(out);
 			// Remove the onClick attribute
 			$('#' + elemid).removeAttr("onClick");
 			$('#' + elemid).addClass("expanded");
