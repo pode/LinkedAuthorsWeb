@@ -1,3 +1,11 @@
+* INSTALLATION
+
+git clone git://github.com/pode/LinkedAuthorsWeb.git
+cd LinkedAuthorsWeb
+mkdir jquery
+cd jquery
+wget http://code.jquery.com/jquery-1.4.2.min.js
+
 * LICENSE
 
 Copyright 2010 ABM-utvikling
