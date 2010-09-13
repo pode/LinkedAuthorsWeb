@@ -10,27 +10,43 @@
 
 $(document).ready(function() {
 
-	// Bind to the author selector
-	$('#authorselect').change(function() {
-		showWorks($("#authorselect option:selected").val());
-	});
-	// Bind to the work selector
-	// $('.work').click(function() {
-	// 	alert('test ' + $(this).text());
-	// });
-	
 });
 
-function showWorks(author) {
+function showWorks() {
 
 	// Clear the list of works
 	$('#workslist').empty();
 	
+	var author = '';
+	if ($("#authorselect option:selected").val() != '') {
+		author = $("#authorselect option:selected").val();
+	} else {
+		return;
+	}
+	var sortby = 'firstEdition';
+	if ($("#sortby option:selected").val() == 'title') {
+		sortby = 'title';
+	}
 	var sortorder = 'ASC';
-	if ($("#sortselect option:selected").val() == 'desc') {
+	if ($("#sortorder option:selected").val() == 'desc') {
 		sortorder = 'DESC';
 	}
-	var url = 'http://bibpode.no/rdfstore/endpoint.php?query=PREFIX+pode%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fvocabulary%23%3E%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0D%0APREFIX+frbr%3A+%3Chttp%3A%2F%2Fpurl.org%2Fvocab%2Ffrbr%2Fcore%23%3E%0D%0APREFIX+person%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fperson%2F%3E+%0D%0A%0D%0ASELECT+DISTINCT+*+WHERE+{%0D%0A%3Fwork+a+frbr%3AWork+%3B%0D%0Adct%3Atitle+%3Ftitle+.%0D%0A%3Fwork+dct%3Acreator+' + author + '+.%0D%0A}%0D%0AORDER+BY+' + sortorder + '(%3Ftitle)&jsonp=?';
+	
+/* Example: 
+PREFIX pode: <http://www.bibpode.no/vocabulary#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX person: <http://www.bibpode.no/person/>
+
+SELECT DISTINCT * WHERE {
+?work a frbr:Work .
+?work pode:firstEdition ?firstEdition .
+?work dct:title ?title .
+?work dct:creator person:Hamsun_Knut .
+} ORDER BY ASC (?firstEdition)
+*/
+	
+	var url = 'http://bibpode.no/rdfstore/endpoint.php?query=PREFIX+pode%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fvocabulary%23%3E%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0D%0APREFIX+frbr%3A+%3Chttp%3A%2F%2Fpurl.org%2Fvocab%2Ffrbr%2Fcore%23%3E%0D%0APREFIX+person%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fperson%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+*+WHERE+{%0D%0A%3Fwork+a+frbr%3AWork+.%0D%0A%3Fwork+pode%3AfirstEdition+%3FfirstEdition+.%0D%0A%3Fwork+dct%3Atitle+%3Ftitle+.%0D%0A%3Fwork+dct%3Acreator+' + author + '+.%0D%0A}+ORDER+BY+' + sortorder + '+%28%3F' + sortby + '%29&jsonp=?';
 	var params = { 'output': 'json' };
 
 	$.getJSON(url, params, function(json, status) {
@@ -38,7 +54,7 @@ function showWorks(author) {
 			// alert(json.results.bindings[0].title.value);
 			$.each(json.results.bindings, function(i, n) {
 				var item = json.results.bindings[i];
-				$('#workslist').append('<li><span class="work" id="work' + i + '" onClick="showExpressions(\'work' + i + '\', \'' + item.work.value + '\');">' + item.title.value + '</span></li>');
+				$('#workslist').append('<li><span class="work" id="work' + i + '" onClick="showExpressions(\'work' + i + '\', \'' + item.work.value + '\');">' + item.title.value + ' (<span class="firstEdition">' + item.firstEdition.value + '</span>)</span></li>');
 			});
 		} else {
 			alert('Something went wrong...');
@@ -58,9 +74,9 @@ function showExpressions(elemid, workuri) {
 		}
 		
 		// Hide all "open" works
-		$('.work').siblings().hide('slow');
+		$('.work').siblings().hide();
 		// Show this one
-		$('#' + elemid).siblings().show('slow');
+		$('#' + elemid).siblings().show();
 		
 	} else {
 
@@ -79,7 +95,7 @@ function showExpressions(elemid, workuri) {
 				});
 				var out = out + '</ul>';
 				// Hide all "open" works
-				$('.work').siblings().hide('slow');
+				$('.work').siblings().hide();
 				// Insert the output after the span that was clicked
 				$('#' + elemid).after(out);
 				// Remove the onClick attribute
@@ -174,13 +190,19 @@ ORDER BY ?title ?issued
 
 <form>
 <!-- Authors -->
-<select name="author" id="authorselect">
+<select name="author" id="authorselect" onChange="showWorks()">
  <option value="">Velg forfatter...</option>
  <option value="person:Hamsun_Knut">Knut Hamsun</option>
  <option value="person:Petterson_Per">Per Petterson</option>
 </select>
+<!-- Sorting - firstEdition is the default -->
+<select name="sortby" id="sortby" onChange="showWorks()">
+ <option value="firstEdition"">Sorter på...</option>
+ <option value="firstEdition">Utgivelsesår</option>
+ <option value="title">Tittel</option>
+</select>
 <!-- Sorting - ASC is the default -->
-<select name="sorting" id="sortselect">
+<select name="sortorder" id="sortorder" onChange="showWorks()">
  <option value="asc"">Velg sortering...</option>
  <option value="asc">Stigende</option>
  <option value="desc">Synkende</option>
