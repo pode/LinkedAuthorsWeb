@@ -20,6 +20,7 @@ function showWorks() {
 	var author = '';
 	if ($("#authorselect option:selected").val() != '') {
 		author = $("#authorselect option:selected").val();
+		showAuthor($("#authorselect option:selected").val());
 	} else {
 		return;
 	}
@@ -38,15 +39,17 @@ PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX frbr: <http://purl.org/vocab/frbr/core#>
 PREFIX person: <http://www.bibpode.no/person/>
 
-SELECT DISTINCT * WHERE {
-?work a frbr:Work .
-?work pode:firstEdition ?firstEdition .
-?work dct:title ?title .
-?work dct:creator person:Hamsun_Knut .
-} ORDER BY ASC (?firstEdition)
+SELECT DISTINCT ?work ?firstEdition ?title WHERE {
+?work a frbr:Work ;
+pode:firstEdition ?firstEdition ;
+dct:title ?title ;
+dct:creator person:Petterson_Per .
+OPTIONAL { ?host frbr:part ?work } .
+FILTER (!bound(?host)) 
+} ORDER BY ASC (?work)
 */
 	
-	var url = 'http://bibpode.no/rdfstore/endpoint.php?query=PREFIX+pode%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fvocabulary%23%3E%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0D%0APREFIX+frbr%3A+%3Chttp%3A%2F%2Fpurl.org%2Fvocab%2Ffrbr%2Fcore%23%3E%0D%0APREFIX+person%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fperson%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+*+WHERE+{%0D%0A%3Fwork+a+frbr%3AWork+.%0D%0A%3Fwork+pode%3AfirstEdition+%3FfirstEdition+.%0D%0A%3Fwork+dct%3Atitle+%3Ftitle+.%0D%0A%3Fwork+dct%3Acreator+' + author + '+.%0D%0A}+ORDER+BY+' + sortorder + '+%28%3F' + sortby + '%29&jsonp=?';
+	var url = 'http://bibpode.no/rdfstore/endpoint.php?query=PREFIX+pode%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fvocabulary%23%3E%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0D%0APREFIX+frbr%3A+%3Chttp%3A%2F%2Fpurl.org%2Fvocab%2Ffrbr%2Fcore%23%3E%0D%0APREFIX+person%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fperson%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Fwork+%3FfirstEdition+%3Ftitle+WHERE+{%0D%0A%3Fwork+a+frbr%3AWork+%3B%0D%0Apode%3AfirstEdition+%3FfirstEdition+%3B%0D%0Adct%3Atitle+%3Ftitle+%3B%0D%0Adct%3Acreator+' + author + '+.%0D%0AOPTIONAL+{+%3Fhost+frbr%3Apart+%3Fwork+}+.%0D%0AFILTER+%28!bound%28%3Fhost%29%29+%0D%0A}+ORDER+BY+' + sortorder + '+%28%3F' + sortby + '%29&jsonp=?';
 	var params = { 'output': 'json' };
 
 	$.getJSON(url, params, function(json, status) {
@@ -170,6 +173,37 @@ ORDER BY ?title ?issued
 	
 }
 
+function showAuthor(author) {
+	
+	// Clear the box
+	$('#authorbox').empty();
+
+	// Fill the box
+
+	// Translate our ID to the DBPedia one
+/* Example: 
+PREFIX person: <http://www.bibpode.no/person/> 
+SELECT DISTINCT ?id WHERE {
+person:Hamsun_Knut owl:sameAs ?id .
+FILTER(REGEX(?id, "dbpedia"))
+}
+*/
+	var url = 'http://bibpode.no/rdfstore/endpoint.php?query=PREFIX+person%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fperson%2F%3E+%0D%0ASELECT+DISTINCT+%3Fid+WHERE+{%0D%0A' + author + '+owl%3AsameAs+%3Fid+.%0D%0AFILTER%28REGEX%28%3Fid%2C+%22dbpedia%22%29%29%0D%0A}&jsonp=?';
+	var params = { 'output': 'json' };
+	$.getJSON(url, params, function(json, status) {
+		if (json.results.bindings){
+			getDbpediaData(json.results.bindings[0].id.value);
+		} else {
+			alert('Something went wrong...');	
+		}
+	});
+	
+}
+
+function getDbpediaData(dbpediaid) {
+	$('#authorbox').append(dbpediaid);
+}
+
 </script>
 <style>
 .work {
@@ -183,6 +217,10 @@ ORDER BY ?title ?issued
 }
 .expanded {
   cursor: default;		
+}
+#authorbox {
+  border: 1px solid black;
+  float: right;
 }
 </style>
 </head>
@@ -209,6 +247,8 @@ ORDER BY ?title ?issued
 </select>
 </form>
 
+<div id="authorbox">
+</div>
 <ul id="workslist">
 </ul>
 
