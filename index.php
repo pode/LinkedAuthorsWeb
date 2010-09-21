@@ -1,4 +1,49 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?php
+
+// A simple proxy for non-JSONP sources
+if (!empty($_GET['what']) && !empty($_GET['who'])) {
+
+
+	$url = '';
+	if ($_GET['what'] == 'dbpedia') {
+		// urlencode($_GET['who'])
+/* Example: 
+SELECT DISTINCT * WHERE {
+<' . urlencode($_GET['who']) . '> dbpedia-owl:thumbnail ?thumbnail 
+OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:activeYearsEndYear ?activeYearsEndYear } .
+OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:activeYearsStartYear ?activeYearsStartYear } .
+OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:birthDate ?birthDate } .
+OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:birthName ?birthName } .
+OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:birthPlace ?birthPlace } .
+OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:deathDate ?deathDate } .
+OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:deathPlace ?deathPlace } .
+}
+*/
+		$url = 'http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&should-sponge=&query=SELECT+DISTINCT+*+WHERE+{%0D%0A%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:thumbnail+%3Fthumbnail+.%0D%0AOPTIONAL+{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:activeYearsEndYear+%3FactiveYearsEndYear+}+.+%0D%0AOPTIONAL++{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:activeYearsStartYear+%3FactiveYearsStartYear+}+.+%0D%0AOPTIONAL++{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:birthDate+%3FbirthDate+}+.+%0D%0AOPTIONAL++{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:birthName+%3FbirthName+}+.+%0D%0AOPTIONAL++{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:birthPlace+%3FbirthPlace+}+.+%0D%0AOPTIONAL++{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:deathDate+%3FdeathDate+}+.+%0D%0AOPTIONAL++{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:deathPlace+%3FdeathPlace+}+.+%0D%0A}&format=' . urlencode('application/sparql-results+json');
+	}
+
+	// create curl resource
+	$ch = curl_init();
+	
+	// set url
+	curl_setopt($ch, CURLOPT_URL, $url);
+	
+	//return the transfer as a string
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	
+	// $output contains the output string
+	$output = curl_exec($ch);
+	
+	// close curl resource to free up system resources
+	curl_close($ch); 
+	
+	header('Content-Type: text/html');
+	echo($_GET['url'] . ' ' . $output);
+
+} else {
+
+echo('<?xml version="1.0" encoding="utf-8" ?>');
+?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -201,7 +246,43 @@ FILTER(REGEX(?id, "dbpedia"))
 }
 
 function getDbpediaData(dbpediaid) {
-	$('#authorbox').append(dbpediaid);
+	
+	var url = 'index.php?what=dbpedia&who=' + dbpediaid;
+	$.getJSON(url, function(json){
+		if (json.results.bindings){
+			// alert(json.results.bindings[0].title.value);
+			var out = '<ul>';
+			$.each(json.results.bindings, function(i, n) {
+				var item = json.results.bindings[i];
+				if (item.thumbnail) {
+					$('#authorbox').append('<img src="' + item.thumbnail.value + '" title="Portrett fra Wikipedia" />');
+				}
+				if (item.birthDate) {
+					$('#authorbox').append('<p>Født: ' + item.birthDate.value + '</p>');
+				}
+				if (item.birthName) {
+					$('#authorbox').append('<p>Fødselsnavn: ' + item.birthName.value + '</p>');
+				}
+				if (item.birthPlace) {
+					$('#authorbox').append('<p>Fødselssted: ' + item.birthPlace.value + '</p>');
+				}
+				if (item.deathDate) {
+					$('#authorbox').append('<p>Død: ' + item.deathDate.value + '</p>');
+				}
+				if (item.activeYearsStartYear) {
+					$('#authorbox').append('<p>Karriere start: ' + item.activeYearsStartYear.value + '</p>');
+				}
+				if (item.activeYearsEndYear) {
+					$('#authorbox').append('<p>Karriere slutt: ' + item.activeYearsEndYear.value + '</p>');
+				}
+				if (item.deathPlace) {
+					$('#authorbox').append('<p>Dødssted: ' + item.deathPlace.value + '</p>');
+				}
+			});
+		}
+ 	});
+ 	$('#authorbox').append('<p>' + dbpediaid + '</p>');
+ 	
 }
 
 </script>
@@ -254,3 +335,5 @@ function getDbpediaData(dbpediaid) {
 
 </body>
 </html>
+
+<?php } ?>
