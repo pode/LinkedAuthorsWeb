@@ -468,6 +468,7 @@ function setDbpediaName(id, uri){
 }
 #authorbox {
   border: 1px solid black;
+  padding: 1em;
   float: right;
 }
 </style>
