@@ -191,45 +191,6 @@ function showExpressions(elemid, workuri) {
 		
 	} else {
 
-
-		// Show parts
-/* Example: 
-PREFIX dct: <http://purl.org/dc/terms/>
-PREFIX frbr: <http://purl.org/vocab/frbr/core#>
-PREFIX pode: <http://www.bibpode.no/vocabulary#>
-
-SELECT DISTINCT ?title ?subtitle ?firstEdition WHERE {
-<http://www.bibpode.no/work/Hamsun_Knut_siesta> frbr:part ?part .
-?part dct:title ?title ;
-pode:firstEdition ?firstEdition .
-OPTIONAL { ?part dct:subtitle ?subtitle . }
-}
-*/
-		var parturl = 'http://bibpode.no/rdfstore/endpoint.php?query=PREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0D%0APREFIX+frbr%3A+%3Chttp%3A%2F%2Fpurl.org%2Fvocab%2Ffrbr%2Fcore%23%3E%0D%0APREFIX+pode%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fvocabulary%23%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Ftitle+%3Fsubtitle+%3FfirstEdition+WHERE+{%0D%0A%3C' + workuri + '%3E+frbr%3Apart+%3Fpart+.%0D%0A%3Fpart+dct%3Atitle+%3Ftitle+%3B%0D%0Apode%3AfirstEdition+%3FfirstEdition+.%0D%0AOPTIONAL+{+%3Fpart+dct%3Asubtitle+%3Fsubtitle+.+}%0D%0A}&jsonp=?';
-		var partparams = { 'output': 'json' };
-		$.getJSON(parturl, partparams, function(json, status) {
-			if (json.results.bindings[0]){
-				// alert(json.results.bindings[0].title.value);
-				var out = '<ul><li>Deler:<ul>';
-				$.each(json.results.bindings, function(i, n) {
-					var item = json.results.bindings[i];
-					var idattribute = elemid + 'expression' + i;
-					// alert(item.title.value);
-					out = out + '<li>' + item.title.value;
-					if (item.subtitle) {
-						out = out + ' : ' + item.title.value;
-					}
-					if (item.firstEdition) {
-						out = out + ' (' + item.firstEdition.value + ')';
-					}
-					out = out + '</li>';
-				});
-				var out = out + '</ul></li></ul>';
-				// Insert the output after the span that was clicked
-				$('#' + elemid).append(out);
-			}
-		});
-
 		// Show expressions
 		var url='http://bibpode.no/rdfstore/endpoint.php?query=PREFIX+pode%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fvocabulary%23%3E%0D%0APREFIX+pode_lf%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Flf%2F%3E+%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0D%0APREFIX+frbr%3A+%3Chttp%3A%2F%2Fpurl.org%2Fvocab%2Ffrbr%2Fcore%23%3E%0D%0APREFIX+person%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fperson%2F%3E+%0D%0APREFIX+work%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fwork%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Flanguage+%3Fformat+WHERE+{%0D%0A%3Fexpression+a+frbr%3AExpression+.%0D%0A%3Fexpression+frbr%3ArealizationOf+%3C' + workuri + '%3E+.%0D%0A%3Fexpression+dct%3Alanguage+%3Flanguage+.%0D%0A%3Fexpression+dct%3Aformat+%3Fformat+.%0D%0A}%0D%0AORDER+BY+%3Flanguage&jsonp=?'
 		
@@ -267,6 +228,44 @@ OPTIONAL { ?part dct:subtitle ?subtitle . }
 			   		setLanguageLabels($(this).attr('id'), $(this).text());
 				});			} else {
 				alert('Something went wrong...');	
+			}
+		});
+		
+		// Show parts
+/* Example: 
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX frbr: <http://purl.org/vocab/frbr/core#>
+PREFIX pode: <http://www.bibpode.no/vocabulary#>
+
+SELECT DISTINCT ?title ?subtitle ?firstEdition WHERE {
+<http://www.bibpode.no/work/Hamsun_Knut_siesta> frbr:part ?part .
+?part dct:title ?title ;
+pode:firstEdition ?firstEdition .
+OPTIONAL { ?part dct:subtitle ?subtitle . }
+}
+*/
+		var parturl = 'http://bibpode.no/rdfstore/endpoint.php?query=PREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%0D%0APREFIX+frbr%3A+%3Chttp%3A%2F%2Fpurl.org%2Fvocab%2Ffrbr%2Fcore%23%3E%0D%0APREFIX+pode%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fvocabulary%23%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Ftitle+%3Fsubtitle+%3FfirstEdition+WHERE+{%0D%0A%3C' + workuri + '%3E+frbr%3Apart+%3Fpart+.%0D%0A%3Fpart+dct%3Atitle+%3Ftitle+%3B%0D%0Apode%3AfirstEdition+%3FfirstEdition+.%0D%0AOPTIONAL+{+%3Fpart+dct%3Asubtitle+%3Fsubtitle+.+}%0D%0A}&jsonp=?';
+		var partparams = { 'output': 'json' };
+		$.getJSON(parturl, partparams, function(json, status) {
+			if (json.results.bindings[0]){
+				// alert(json.results.bindings[0].title.value);
+				var out = '<ul><li>Deler:<ul>';
+				$.each(json.results.bindings, function(i, n) {
+					var item = json.results.bindings[i];
+					var idattribute = elemid + 'expression' + i;
+					// alert(item.title.value);
+					out = out + '<li>' + item.title.value;
+					if (item.subtitle) {
+						out = out + ' : ' + item.title.value;
+					}
+					if (item.firstEdition) {
+						out = out + ' (' + item.firstEdition.value + ')';
+					}
+					out = out + '</li>';
+				});
+				var out = out + '</ul></li></ul>';
+				// Insert the output after the span that was clicked
+				$('#' + elemid).after(out);
 			}
 		});
 	
