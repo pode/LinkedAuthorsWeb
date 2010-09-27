@@ -56,6 +56,36 @@ echo('<?xml version="1.0" encoding="utf-8" ?>');
 <script src="jquery/jquery-1.4.2.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 
+// Global variables to hold languages and formats
+var languages = new Array();
+
+var formats = new Array();
+// Pre-fetch the formats
+/* SPARQL: 
+PREFIX pode: <http://www.bibpode.no/vocabulary#>
+PREFIX rdf :<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT DISTINCT * WHERE {
+?format a pode:PhysicalFormat .
+?format rdfs:label ?label .
+}
+*/
+var url = 'http://bibpode.no/rdfstore/endpoint.php?query=PREFIX+pode%3A+%3Chttp%3A%2F%2Fwww.bibpode.no%2Fvocabulary%23%3E%0D%0APREFIX+rdf+%3A%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0D%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0A%0D%0ASELECT+DISTINCT+*+WHERE+{%0D%0A%3Fformat+a+pode%3APhysicalFormat+.%0D%0A%3Fformat+rdfs%3Alabel+%3Flabel+.%0D%0A}&jsonp=?';
+var params = { 'output': 'json' };
+
+$.getJSON(url, params, function(json, status) {
+	if (json.results.bindings){
+		// alert(json.results.bindings[0].title.value);
+		$.each(json.results.bindings, function(i, n) {
+			var item = json.results.bindings[i];
+			formats[item.format.value] = item.label.value;
+		});
+	} else {
+		alert('Unable to fetch formats');
+	}
+});
+
+
 $(document).ready(function() {
 
 });
@@ -142,7 +172,14 @@ function showExpressions(elemid, workuri) {
 				$.each(json.results.bindings, function(i, n) {
 					var item = json.results.bindings[i];
 					var idattribute = elemid + 'expression' + i;
-					out = out + '<li><span id="' + idattribute + '" class="expression" onClick="showManifestations(\'' + idattribute + '\', \'' + workuri + '\', \'' + item.language.value + '\', \'' + item.format.value + '\');">' + item.language.value + ' ' + item.format.value + '</span></li>';
+					out = out + '<li><span id="' + idattribute + '" class="expression" onClick="showManifestations(\'' + idattribute + '\', \'' + workuri + '\', \'' + item.language.value + '\', \'' + item.format.value + '\');">';
+					out = out + '<span class="language uri">' + item.language.value + '</span> ';
+					if (formats[item.format.value]) {
+						out = out + '<span class="format">' + formats[item.format.value] + '</span>';
+					} else {
+						out = out + '<span class="format uri">' + item.format.value + '</span>';
+					}
+					out = out + '</span></li>';
 				});
 				var out = out + '</ul>';
 				// Hide all "open" works
