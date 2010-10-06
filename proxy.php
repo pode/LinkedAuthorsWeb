@@ -80,6 +80,7 @@ select distinct * where {
 		$sparql = '
 SELECT DISTINCT * WHERE {
 <' . $_GET['who'] . '> dbpedia-owl:thumbnail ?thumbnail 
+OPTIONAL { <' . $_GET['who'] . '> dbpprop:name ?name } .
 OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:activeYearsEndYear ?activeYearsEndYear } .
 OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:activeYearsStartYear ?activeYearsStartYear } .
 OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:birthDate ?birthDate } .

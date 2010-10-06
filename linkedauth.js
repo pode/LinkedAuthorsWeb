@@ -374,6 +374,9 @@ function getDbpediaData(dbpediaid) {
 			// alert(json.results.bindings[0].title.value);
 			$.each(json.results.bindings, function(i, n) {
 				var item = json.results.bindings[i];
+				if (item.name) {
+					$('#authorbox').append('<p id="authorsname">' + item.name.value + '</p>');
+				}
 				if (item.thumbnail) {
 					$('#authorbox').append('<img src="' + item.thumbnail.value + '" title="Portrett fra Wikipedia" />');
 				}

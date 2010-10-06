@@ -36,3 +36,6 @@ along with "Podes LinkedAuthorsWeb". If not, see <http://www.gnu.org/licenses/&g
   padding: 1em;
   float: right;
 }
+#authorsname {
+  font-weight: bold;	
+}
