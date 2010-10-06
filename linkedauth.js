@@ -65,7 +65,7 @@ function showWorks() {
 					var item = json.results.bindings[i];
 					if (languages[item.language.value]) {
 						$('#language_select').append('<option value="' + item.language.value + '">' + languages[item.language.value] + '</option>');
-					} else {
+					} else {
 						$('#language_select').append('<option value="' + item.language.value + '">' + item.language.value + '</option>');
 					}
 				});
@@ -175,7 +175,7 @@ function showExpressions(elemid, workuri) {
 						if (expressions[item.expression.value].format.value && expressions[item.expression.value].format.value == 'http://www.bibpode.no/ff/di') {
 							expressions[item.expression.value].format.value = item.format.value;
 						}
-					} else {
+					} else {
 						expressions[item.expression.value] = item;
 					} 
 				});
@@ -187,7 +187,7 @@ function showExpressions(elemid, workuri) {
 					out = out + '<li><span id="' + idattribute + '" class="expression" onClick="showManifestations(\'' + idattribute + '\', \'' + workuri + '\', \'';
 					if (item.language) {
 						out = out + item.language.value;
-					} else {
+					} else {
 						out = out + $("#language_select option:selected").val();
 					}
 					out = out + '\', \'' + item.format.value + '\');">';
@@ -196,7 +196,7 @@ function showExpressions(elemid, workuri) {
 						out = out + ' på ';
 						if (languages[item.language.value]) {
 							out = out + '<span class="language">' + languages[item.language.value] + '</span>';
-						} else {
+						} else {
 							out = out + '<span class="language languageuri" id="' + idattribute + 'language">' + item.language.value + '</span>';
 						}
 					}
@@ -396,7 +396,7 @@ function getDbpediaData(dbpediaid) {
 				}
 				if (item.deathPlaceName) {
 					$('#authorbox').append('<p>Dødssted: <span id="deathPlace">' + item.deathPlaceName.value + '</span></p>');
-				} else if (item.deathPlace) {
+				} else if (item.deathPlace) {
 					var name = dbpediauri2name(item.deathPlace.value);
 					$('#authorbox').append('<p>Dødssted: <span id="deathPlace" class="uri">' + name + '</span></p>');
 				}
@@ -421,6 +421,32 @@ function getDbpediaData(dbpediaid) {
     	// 	setDbpediaName($(this).attr('id'), $(this).text());
 		// });
  	});
+
+	var url = 'proxy.php?what=influenced&who=' + dbpediaid;
+	$.getJSON(url, function(json){
+		if (json.results.bindings[0]){
+			$('#authorbox').append('<p>Påvirket:</p><ul id="influenced"></ul>');
+			$.each(json.results.bindings, function(i, n) {
+				var item = json.results.bindings[i];
+				if (item.authorName) {
+					$('#influenced').append('<li>' + item.authorName.value + '</li>');
+				}
+			});
+		}
+	});
+	
+	var url = 'proxy.php?what=influences&who=' + dbpediaid;
+	$.getJSON(url, function(json){
+		if (json.results.bindings[0]){
+			$('#authorbox').append('<p>Påvirket av:</p><ul id="influences"></ul>');
+			$.each(json.results.bindings, function(i, n) {
+				var item = json.results.bindings[i];
+				if (item.authorName) {
+					$('#influences').append('<li>' + item.authorName.value + '</li>');
+				}
+			});
+		}
+	});
  	
 }
 

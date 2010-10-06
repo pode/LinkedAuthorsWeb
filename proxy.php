@@ -54,7 +54,27 @@ if (!empty($_GET['lexvo']) && !empty($_GET['label'])) {
 
 
 	$url = '';
-	if ($_GET['what'] == 'dbpedia') {
+	if ($_GET['what'] == 'influenced') {
+		
+		$sparql = '
+select distinct * where {
+<' . $_GET["who"] . '> dbpprop:influenced ?author .
+?author foaf:name ?authorName .
+}';
+
+		$url = 'http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&should-sponge=&query=' . urlencode($sparql) . '&format=' . urlencode('application/sparql-results+json');
+		
+	} elseif ($_GET['what'] == 'influences') {
+		
+		$sparql = '
+select distinct * where {
+<' . $_GET["who"] . '> dbpprop:influences ?author .
+?author foaf:name ?authorName .
+}';
+
+		$url = 'http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&should-sponge=&query=' . urlencode($sparql) . '&format=' . urlencode('application/sparql-results+json');
+		
+	} elseif($_GET['what'] == 'dbpedia') {
 		// urlencode($_GET['who'])
 		
 		$sparql = '
