@@ -1,109 +1,3 @@
-<?php
-
-// Fetch language data from Lexvo
-if (!empty($_GET['lexvo']) && !empty($_GET['label'])) {
-	
-	if (preg_match('/^http:\/\/lexvo.org\/id\/iso639-3\/[a-z]{2,3}$/', $_GET['lexvo'])) {
-		$url = $_GET['lexvo'];
-		// We need to massage the URL to get it in a format Lexvo likes
-		$url = preg_replace('/\/id\//', '/data/', $url);
-		$url = preg_replace('/lexvo/', 'www.lexvo', $url);
-		
-		// create curl resource
-		$ch = curl_init($url);
-		curl_setopt($ch, CURLOPT_HEADER, true);
-		//return the transfer as a string
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array (
-         	"Accept: application/rdf+xml"
-    	));
-    	curl_setopt($ch, CURLOPT_FAILONERROR, true);
-		// Get the contents of the page
-		$rdf = curl_exec($ch);
-		// close curl resource to free up system resources
-		curl_close($ch); 
-		
-		preg_match('/' . $_GET['label'] . '">(.*)</', $rdf, $match);
-		echo(json_encode(array('label' => $match[1])));
-		exit;
-	}
-	
-// A simple proxy for non-JSONP sources
-} elseif (!empty($_GET['what']) && !empty($_GET['who'])) {
-
-
-	$url = '';
-	if ($_GET['what'] == 'dbpedia') {
-		// urlencode($_GET['who'])
-		
-		$sparql = '
-SELECT DISTINCT * WHERE {
-<' . $_GET['who'] . '> dbpedia-owl:thumbnail ?thumbnail 
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:activeYearsEndYear ?activeYearsEndYear } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:activeYearsStartYear ?activeYearsStartYear } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:birthDate ?birthDate } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:birthName ?birthName } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:birthPlace ?birthPlace } .
-OPTIONAL { ?birthPlace dbpprop:name ?birthPlaceName } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:deathDate ?deathDate } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:deathPlace ?deathPlace } .
-OPTIONAL { ?deathPlace dbpprop:name ?deathPlaceName } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:nationality ?nationality } .
-OPTIONAL { ?nationality dbpedia-owl:thumbnail ?nationalityThumbnail } .
-OPTIONAL { ?nationality dbpprop:nativeName ?nationalityLabel } .
-}';
-		
-/* Example: 
-SELECT DISTINCT * WHERE {
-<' . urlencode($_GET['who']) . '> dbpedia-owl:thumbnail ?thumbnail 
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:activeYearsEndYear ?activeYearsEndYear } .
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:activeYearsStartYear ?activeYearsStartYear } .
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:birthDate ?birthDate } .
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:birthName ?birthName } .
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:birthPlace ?birthPlace } .
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:deathDate ?deathDate } .
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:deathPlace ?deathPlace } .
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:nationality ?nationality } .
-}
-*/
-		$url = 'http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&should-sponge=&query=' . urlencode($sparql) . '&format=' . urlencode('application/sparql-results+json');
-		// w/nationality $url = 'http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&should-sponge=&query=SELECT+DISTINCT+*+WHERE+{%0D%0A%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:thumbnail+%3Fthumbnail+.%0D%0AOPTIONAL+{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:activeYearsEndYear+%3FactiveYearsEndYear+}+.+%0D%0AOPTIONAL++{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:activeYearsStartYear+%3FactiveYearsStartYear+}+.+%0D%0AOPTIONAL++{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:birthDate+%3FbirthDate+}+.+%0D%0AOPTIONAL++{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:birthName+%3FbirthName+}+.+%0D%0AOPTIONAL++{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:nationality+%3Fnationality+}+.+%0D%0AOPTIONAL++{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:birthPlace+%3FbirthPlace+}+.+%0D%0AOPTIONAL++{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:deathDate+%3FdeathDate+}+.+%0D%0AOPTIONAL++{+%3C' . urlencode($_GET['who']) . '%3E+dbpedia-owl:deathPlace+%3FdeathPlace+}+.+%0D%0A}&format=' . urlencode('application/sparql-results+json');
-	
-	} elseif($_GET['what'] == 'dbpedianame') {
-		$url = 'http://dbpedia.org/sparql?default-graph-uri=http%3A%2F%2Fdbpedia.org&should-sponge=&query=select+distinct+%3Fname+where+{%3C' . urlencode($_GET['who']) . '%3E+dbpprop%3Aname+%3Fname}&format=' . urlencode('application/sparql-results+json');
-	}
-
-	// create curl resource
-	$ch = curl_init();
-	
-	// set url
-	curl_setopt($ch, CURLOPT_URL, $url);
-	
-	//return the transfer as a string
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	
-	// $output contains the output string
-	$output = curl_exec($ch);
-	
-	// close curl resource to free up system resources
-	curl_close($ch); 
-	
-	header('Content-Type: application/sparql-results+json');
-	echo($_GET['url'] . ' ' . $output);
-
-} else {
-
-echo('<?xml version="1.0" encoding="utf-8" ?>');
-?>
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="nb_NO">
-<head>
-<title>LinkedAuthors</title>
-<script src="jquery/jquery-1.4.2.min.js" type="text/javascript"></script>
-<script type="text/javascript">
-
 var endpointprefix = 'http://bibpode.no/rdfstore/endpoint.php?query=';
 var endpointpostfix = '&jsonp=?';
 
@@ -345,7 +239,7 @@ OPTIONAL { ?part dct:subtitle ?subtitle . }
 
 function setLanguageLabels(id, uri){
 	
-	var url = 'index.php?label=nb&lexvo=' + uri;
+	var url = 'proxy.php?label=nb&lexvo=' + uri;
 	var name = '';
 	$.getJSON(url, function(json){
 		// alert(json.label);
@@ -453,7 +347,7 @@ FILTER(REGEX(?id, "dbpedia"))
 
 function getDbpediaData(dbpediaid) {
 	
-	var url = 'index.php?what=dbpedia&who=' + dbpediaid;
+	var url = 'proxy.php?what=dbpedia&who=' + dbpediaid;
 	$.getJSON(url, function(json){
 		if (json.results.bindings){
 			// alert(json.results.bindings[0].title.value);
@@ -521,7 +415,7 @@ function dbpediauri2name(s) {
 
 function setDbpediaName(id, uri){
 	
-	var url = 'index.php?what=dbpedianame&who=' + uri;
+	var url = 'proxy.php?what=dbpedianame&who=' + uri;
 	var name = '';
 	$.getJSON(url, function(json){
 		if (json.results.bindings[0]){
@@ -541,60 +435,3 @@ function setDbpediaName(id, uri){
 
 }
 
-</script>
-<style>
-.work {
-  cursor: pointer;	
-}
-.expression {
-  cursor: pointer;	
-}
-.manifestation {
-  cursor: default;	
-}
-.expanded {
-  cursor: default;		
-}
-#authorbox {
-  border: 1px solid black;
-  padding: 1em;
-  float: right;
-}
-</style>
-</head>
-<body>
-
-<form>
-<!-- Authors -->
-<select name="author" id="authorselect" onChange="showWorks()">
- <option value="">Velg forfatter...</option>
- <option value="person:Hamsun_Knut">Knut Hamsun</option>
- <option value="person:Petterson_Per">Per Petterson</option>
-</select>
-<!-- Sorting - firstEdition is the default -->
-<select name="sortby" id="sortby" onChange="showWorks()">
- <option value="firstEdition"">Sorter på...</option>
- <option value="firstEdition">Utgivelsesår</option>
- <option value="title">Tittel</option>
-</select>
-<!-- Sorting - ASC is the default -->
-<select name="sortorder" id="sortorder" onChange="showWorks()">
- <option value="asc"">Velg sortering...</option>
- <option value="asc">Stigende</option>
- <option value="desc">Synkende</option>
-</select>
-<!-- Select language - this list is filled at runtime, based on the author selected -->
-<select name="language_select" id="language_select" onChange="showWorks()">
- <option value="">Velg språk...</option>
-</select>
-</form>
-
-<div id="authorbox">
-</div>
-<ul id="workslist">
-</ul>
-
-</body>
-</html>
-
-<?php } ?>

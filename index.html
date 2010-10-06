@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="nb_NO">
+<head>
+<title>LinkedAuthors</title>
+<script src="jquery/jquery-1.4.2.min.js" type="text/javascript"></script>
+<script src="linkedauth.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="linkedauth.css" />
+</head>
+<body>
+
+<form>
+<!-- Authors -->
+<select name="author" id="authorselect" onChange="showWorks()">
+ <option value="">Velg forfatter...</option>
+ <option value="person:Hamsun_Knut">Knut Hamsun</option>
+ <option value="person:Petterson_Per">Per Petterson</option>
+</select>
+<!-- Sorting - firstEdition is the default -->
+<select name="sortby" id="sortby" onChange="showWorks()">
+ <option value="firstEdition"">Sorter på...</option>
+ <option value="firstEdition">Utgivelsesår</option>
+ <option value="title">Tittel</option>
+</select>
+<!-- Sorting - ASC is the default -->
+<select name="sortorder" id="sortorder" onChange="showWorks()">
+ <option value="asc"">Velg sortering...</option>
+ <option value="asc">Stigende</option>
+ <option value="desc">Synkende</option>
+</select>
+<!-- Select language - this list is filled at runtime, based on the author selected -->
+<select name="language_select" id="language_select" onChange="showWorks()">
+ <option value="">Velg språk...</option>
+</select>
+</form>
+
+<div id="authorbox">
+</div>
+<ul id="workslist">
+</ul>
+
+</body>
+</html>
+
+<?php } ?>
