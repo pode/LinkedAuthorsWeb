@@ -425,6 +425,18 @@ function getDbpediaData(dbpediaid) {
 		// });
  	});
 
+	var url = 'proxy.php?what=abstract&who=' + dbpediaid;
+	$.getJSON(url, function(json){
+		if (json.results.bindings[0]){
+			$.each(json.results.bindings, function(i, n) {
+				var item = json.results.bindings[i];
+				if (item.abstract) {
+					$('#authorbox').append('<p id="abstract">' + item.abstract.value + '</p>');
+				}
+			});
+		}
+	});
+
 	var url = 'proxy.php?what=influenced&who=' + dbpediaid;
 	$.getJSON(url, function(json){
 		if (json.results.bindings[0]){

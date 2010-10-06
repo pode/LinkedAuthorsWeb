@@ -74,6 +74,16 @@ select distinct * where {
 
 		$url = 'http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&should-sponge=&query=' . urlencode($sparql) . '&format=' . urlencode('application/sparql-results+json');
 		
+	} elseif ($_GET['what'] == 'abstract') {
+		
+		$sparql = '
+SELECT DISTINCT * WHERE {
+<' . $_GET["who"] . '> dbpedia-owl:abstract ?abstract .
+filter langMatches(lang(?abstract), "nn")
+}';
+
+		$url = 'http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&should-sponge=&query=' . urlencode($sparql) . '&format=' . urlencode('application/sparql-results+json');
+		
 	} elseif($_GET['what'] == 'dbpedia') {
 		// urlencode($_GET['who'])
 		
