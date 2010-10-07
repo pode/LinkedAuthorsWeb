@@ -397,42 +397,43 @@ function getDbpediaData(dbpediaid) {
 				if (item.thumbnail) {
 					$('#authorbox').append('<img src="' + item.thumbnail.value + '" title="Portrett fra Wikipedia" />');
 				}
+				$('#authorbox').append('<ul id="authorfactlist"></ul>');
 				if (item.birthName) {
-					$('#authorbox').append('<p>Fødselsnavn: ' + item.birthName.value + '</p>');
+					$('#authorfactlist').append('<li>Fødselsnavn: ' + item.birthName.value + '</li>');
 				}
 				if (item.birthDate) {
 					var birthDate = new Date(item.birthDate.value);
-					$('#authorbox').append('<p>Født: ' + birthDate.toLocaleDateString() + '</p>');
+					$('#authorfactlist').append('<li>Født: ' + birthDate.toLocaleDateString() + '</li>');
 				}
 				if (item.birthPlaceName) {
-					$('#authorbox').append('<p>Fødselssted: <span id="birthPlace" class="uri">' + item.birthPlaceName.value + '</span></p>');
+					$('#authorfactlist').append('<li>Fødselssted: <span id="birthPlace" class="uri">' + item.birthPlaceName.value + '</span></li>');
 				} else if (item.birthPlace) {
 					var name = dbpediauri2name(item.birthPlace.value);
-					$('#authorbox').append('<p>Fødselssted: <span id="birthPlace" class="uri">' + name + '</span></p>');
+					$('#authorfactlist').append('<li>Fødselssted: <span id="birthPlace" class="uri">' + name + '</span></li>');
 				}
 				if (item.deathDate) {
 					var deathDate = new Date(item.deathDate.value);
-					$('#authorbox').append('<p>Død: ' + deathDate.toLocaleDateString() + '</p>');
+					$('#authorfactlist').append('<li>Død: ' + deathDate.toLocaleDateString() + '</li>');
 				}
 				if (item.deathPlaceName) {
-					$('#authorbox').append('<p>Dødssted: <span id="deathPlace">' + item.deathPlaceName.value + '</span></p>');
+					$('#authorfactlist').append('<li>Dødssted: <span id="deathPlace">' + item.deathPlaceName.value + '</span></li>');
 				} else if (item.deathPlace) {
 					var name = dbpediauri2name(item.deathPlace.value);
-					$('#authorbox').append('<p>Dødssted: <span id="deathPlace" class="uri">' + name + '</span></p>');
+					$('#authorfactlist').append('<li>Dødssted: <span id="deathPlace" class="uri">' + name + '</span></li>');
+				}
+				if (item.activeYearsStartYear) {
+					var activeYearsStartYear = new Date(item.activeYearsStartYear.value);
+					$('#authorfactlist').append('<li>Karriere start: ' + activeYearsStartYear.getFullYear() + '</li>');
+				}
+				if (item.activeYearsEndYear) {
+					var activeYearsEndYear = new Date(item.activeYearsEndYear.value);
+					$('#authorfactlist').append('<li>Karriere slutt: ' + activeYearsEndYear.getFullYear() + '</li>');
 				}
 				if (item.nationalityThumbnail) {
 					$('#authorbox').append('<p id="nationality">Nasjonalitet:<br /> <img height="72" width="100" src="' + item.nationalityThumbnail.value + '" /></p>');
 					if (item.nationalityLabel) {
 						$('#nationality').append('<br />' + item.nationalityLabel.value);
 					}
-				}
-				if (item.activeYearsStartYear) {
-					var activeYearsStartYear = new Date(item.activeYearsStartYear.value);
-					$('#authorbox').append('<p>Karriere start: ' + activeYearsStartYear.getFullYear() + '</p>');
-				}
-				if (item.activeYearsEndYear) {
-					var activeYearsEndYear = new Date(item.activeYearsEndYear.value);
-					$('#authorbox').append('<p>Karriere slutt: ' + activeYearsEndYear.getFullYear() + '</p>');
 				}
 			});
 		}
@@ -448,7 +449,7 @@ function getDbpediaData(dbpediaid) {
 			$.each(json.results.bindings, function(i, n) {
 				var item = json.results.bindings[i];
 				if (item.abstract) {
-					$('#authorbox').append('<p id="abstract">' + item.abstract.value + '</p>');
+					$('#authorbox').append('<p id="abstract">' + item.abstract.value.substring(0, item.abstract.value.indexOf('.', 100)+1) + ' <a href="' + item.page.value + '" target="_blank">Les mer på Wikipedia</a></p>');
 				}
 			});
 		}

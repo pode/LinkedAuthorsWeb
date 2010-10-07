@@ -78,7 +78,8 @@ select distinct * where {
 		
 		$sparql = '
 SELECT DISTINCT * WHERE {
-<' . $_GET["who"] . '> dbpedia-owl:abstract ?abstract .
+<' . $_GET['who'] . '> foaf:page ?page ;
+dbpedia-owl:abstract ?abstract .
 filter langMatches(lang(?abstract), "nn")
 }';
 
