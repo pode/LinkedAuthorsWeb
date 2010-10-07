@@ -358,6 +358,7 @@ ORDER BY ?title ?issued
 function showAuthor(author) {
 	
 	// Clear the box
+	$('#authorbox').show();
 	$('#authorbox').empty();
 
 	// Fill the box
