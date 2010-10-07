@@ -164,7 +164,7 @@ function showExpressions(elemid, workuri) {
 	
 		$.getJSON(expr_url, params, function(json, status) {
 			if (json.results.bindings){
-				var out = '<ul>';
+				var out = '<ul class="expressions">';
 				var expressions = new Array();
 				$.each(json.results.bindings, function(i, n) {
 					var item = json.results.bindings[i];
@@ -208,11 +208,27 @@ function showExpressions(elemid, workuri) {
 				$('.work').siblings().hide();
 				// Insert the output after the span that was clicked
 				$('#' + elemid).after(out);
+
+				// Show Gutenberg editions
+				$.getJSON('fulltext.php?work=' + workuri, function(json){
+					// alert(json.label);
+					if (json && json[0]){
+						var out = '<ul class="fulltext">'
+						$.each(json, function(i, n) {
+							out = out + '<li>Fulltekst: <a href="' + json[i].url + '" target="_blank">' + json[i].title + '</a></li>';
+						});
+						out = out + '</ul>';
+						$('#' + elemid).after(out);
+					}
+			 	});
+
 			 	// Turn URIs into labels
 				$('.languageuri').each(function(index) {
 					// alert($(this).attr('id'));
 			   		setLanguageLabels($(this).attr('id'), $(this).text());
-				});			} else {
+				});			
+				
+			} else {
 				alert('Something went wrong...');	
 			}
 		});
@@ -235,7 +251,7 @@ OPTIONAL { ?part dct:subtitle ?subtitle . }
 		$.getJSON(parturl, partparams, function(json, status) {
 			if (json.results.bindings[0]){
 				// alert(json.results.bindings[0].title.value);
-				var out = '<ul><li>Deler:<ul>';
+				var out = '<ul class="parts"><li>Deler:<ul>';
 				$.each(json.results.bindings, function(i, n) {
 					var item = json.results.bindings[i];
 					var idattribute = elemid + 'expression' + i;
