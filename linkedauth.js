@@ -209,19 +209,6 @@ function showExpressions(elemid, workuri) {
 				// Insert the output after the span that was clicked
 				$('#' + elemid).after(out);
 
-				// Show Gutenberg editions
-				$.getJSON('fulltext.php?work=' + workuri, function(json){
-					// alert(json.label);
-					if (json && json[0]){
-						var out = '<ul class="fulltext">'
-						$.each(json, function(i, n) {
-							out = out + '<li>Fulltekst: <a href="' + json[i].url + '" target="_blank">' + json[i].title + '</a></li>';
-						});
-						out = out + '</ul>';
-						$('#' + elemid).after(out);
-					}
-			 	});
-
 			 	// Turn URIs into labels
 				$('.languageuri').each(function(index) {
 					// alert($(this).attr('id'));
@@ -324,7 +311,7 @@ ORDER BY ?title ?issued
 	
 	$.getJSON(url, params, function(json, status) {
 		if (json.results.bindings){
-			var out = '<ul>';
+			var out = '<ul class="manifestations">';
 			$.each(json.results.bindings, function(i, n) {
 				var item = json.results.bindings[i];
 				var idattribute = elemid + 'manifestation' + i;
@@ -345,12 +332,55 @@ ORDER BY ?title ?issued
 			});
 			var out = out + '</ul>';
 			$('#' + elemid).after(out);
+
+			// Show Gutenberg editions
+					   var guten_sparql = 'PREFIX frbr: <http://purl.org/vocab/frbr/core#> \n';
+			guten_sparql = guten_sparql + 'PREFIX lexvo: <http://lexvo.org/id/iso639-3/> \n';
+			guten_sparql = guten_sparql + 'PREFIX dct: <http://purl.org/dc/terms/> \n';
+			guten_sparql = guten_sparql + 'SELECT DISTINCT ?manifestation WHERE { \n';
+			guten_sparql = guten_sparql + '?expression a frbr:Expression . \n';
+			guten_sparql = guten_sparql + '?expression frbr:realizationOf <' + workuri + '> . \n';
+			guten_sparql = guten_sparql + '?expression frbr:embodiment ?manifestation . \n';
+			guten_sparql = guten_sparql + '?expression dct:language <' + languageuri + '> . \n';
+			guten_sparql = guten_sparql + 'FILTER(REGEX(?manifestation, "gutenberg")) \n';
+			guten_sparql = guten_sparql + '} ';
+	
+			var guten_url = endpointprefix + escape(guten_sparql) + endpointpostfix;
+			var params = { 'output': 'json' };
+			
+			$.getJSON(guten_url, params, function(json){
+				// alert(json.label);
+				if (json.results.bindings){
+					var thiselemid = elemid + 'fulltext';
+					$('#' + elemid).after('<ul id="' + thiselemid + '"></ul>'); 
+					var name = '';
+					$.each(json.results.bindings, function(i, n) {
+						var item = json.results.bindings[i];
+						
+						var url = 'proxy.php?what=gutenberg&who=' + item.manifestation.value;
+						$.getJSON(url, function(json){
+							if (json.results.bindings){
+								// alert(json.results.bindings[0].title.value);
+								$.each(json.results.bindings, function(i, n) {
+									var gutenitem = json.results.bindings[i];
+									alert(thiselemid + ' <li><a href="' + item.manifestation.value + '" target="_blank">' + gutenitem.title.value + '</a> fulltekst fra Gutenberg</li>');
+									$('#' + thiselemid).append('<li><a href="' + item.manifestation.value + '" target="_blank">' + gutenitem.title.value + '</a> fulltekst fra Gutenberg</li>');
+								});
+							}
+					 	});
+						
+					});
+				}
+		 	});
+
 			// Remove the onClick attribute
 			$('#' + elemid).removeAttr("onClick");
 			$('#' + elemid).addClass("expanded");
+			
 		} else {
 			alert('Something went wrong...');	
 		}
+		
 	});
 	
 }

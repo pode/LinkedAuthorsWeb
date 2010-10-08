@@ -54,7 +54,21 @@ if (!empty($_GET['lexvo']) && !empty($_GET['label'])) {
 
 
 	$url = '';
-	if ($_GET['what'] == 'influenced') {
+	
+	if ($_GET['what'] == 'gutenberg') {
+		
+		// Chop off the 32 first characters, to get the numeric ID
+		$gutenid = substr($_GET['who'], 32);
+		// Construct the SPARQL query
+		$sparql = '
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?title WHERE {
+<http://www4.wiwiss.fu-berlin.de/gutendata/resource/etext' . $gutenid . '> rdfs:label ?title .
+}';
+		// Assemble the URL
+		$url = 'http://www4.wiwiss.fu-berlin.de/gutendata/sparql?query=' . urlencode($sparql) . '&output=json';
+
+	} elseif ($_GET['what'] == 'influenced') {
 		
 		$sparql = '
 select distinct * where {
