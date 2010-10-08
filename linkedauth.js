@@ -363,7 +363,7 @@ ORDER BY ?title ?issued
 								// alert(json.results.bindings[0].title.value);
 								$.each(json.results.bindings, function(i, n) {
 									var gutenitem = json.results.bindings[i];
-									alert(thiselemid + ' <li><a href="' + item.manifestation.value + '" target="_blank">' + gutenitem.title.value + '</a> fulltekst fra Gutenberg</li>');
+									// alert(thiselemid + ' <li><a href="' + item.manifestation.value + '" target="_blank">' + gutenitem.title.value + '</a> fulltekst fra Gutenberg</li>');
 									$('#' + thiselemid).append('<li><a href="' + item.manifestation.value + '" target="_blank">' + gutenitem.title.value + '</a> fulltekst fra Gutenberg</li>');
 								});
 							}
