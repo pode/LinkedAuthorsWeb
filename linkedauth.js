@@ -389,7 +389,7 @@ function showAuthor(author) {
 	
 	// Clear the box
 	$('#authorbox').show();
-	$('#authorbox').empty();
+	$('.authorboxpart').empty();
 
 	// Fill the box
 
@@ -422,12 +422,12 @@ function getDbpediaData(dbpediaid) {
 			$.each(json.results.bindings, function(i, n) {
 				var item = json.results.bindings[i];
 				if (item.name) {
-					$('#authorbox').append('<p id="authorsname">' + item.name.value + '</p>');
+					$('#authorfacts').append('<p id="authorsname">' + item.name.value + '</p>');
 				}
 				if (item.thumbnail) {
-					$('#authorbox').append('<img src="' + item.thumbnail.value + '" title="Portrett fra Wikipedia" />');
+					$('#authorfacts').append('<img src="' + item.thumbnail.value + '" title="Portrett fra Wikipedia" />');
 				}
-				$('#authorbox').append('<ul id="authorfactlist"></ul>');
+				$('#authorfacts').append('<ul id="authorfactlist"></ul>');
 				if (item.birthName) {
 					$('#authorfactlist').append('<li>Fødselsnavn: ' + item.birthName.value + '</li>');
 				}
@@ -460,7 +460,7 @@ function getDbpediaData(dbpediaid) {
 					$('#authorfactlist').append('<li>Karriere slutt: ' + activeYearsEndYear.getFullYear() + '</li>');
 				}
 				if (item.nationalityThumbnail) {
-					$('#authorbox').append('<p id="nationality">Nasjonalitet:<br /> <img height="72" width="100" src="' + item.nationalityThumbnail.value + '" /></p>');
+					$('#authorfacts').append('<p id="nationality">Nasjonalitet:<br /> <img height="72" width="100" src="' + item.nationalityThumbnail.value + '" /></p>');
 					if (item.nationalityLabel) {
 						$('#nationality').append('<br />' + item.nationalityLabel.value);
 					}
@@ -479,7 +479,7 @@ function getDbpediaData(dbpediaid) {
 			$.each(json.results.bindings, function(i, n) {
 				var item = json.results.bindings[i];
 				if (item.abstract) {
-					$('#authorbox').append('<p id="abstract">' + item.abstract.value.substring(0, item.abstract.value.indexOf('.', 100)+1) + ' <a href="' + item.page.value + '" target="_blank">Les mer på Wikipedia</a></p>');
+					$('#authorabstract').append('<p id="abstract">' + item.abstract.value.substring(0, item.abstract.value.indexOf('.', 100)+1) + ' <a href="' + item.page.value + '" target="_blank">Les mer på Wikipedia</a></p>');
 				}
 			});
 		}
@@ -488,7 +488,7 @@ function getDbpediaData(dbpediaid) {
 	var url = 'proxy.php?what=influenced&who=' + dbpediaid;
 	$.getJSON(url, function(json){
 		if (json.results.bindings[0]){
-			$('#authorbox').append('<p>Påvirket:</p><ul id="influenced"></ul>');
+			$('#authorinfluenced').append('<p>Påvirket:</p><ul id="influenced"></ul>');
 			$.each(json.results.bindings, function(i, n) {
 				var item = json.results.bindings[i];
 				if (item.authorName) {
@@ -501,7 +501,7 @@ function getDbpediaData(dbpediaid) {
 	var url = 'proxy.php?what=influences&who=' + dbpediaid;
 	$.getJSON(url, function(json){
 		if (json.results.bindings[0]){
-			$('#authorbox').append('<p>Påvirket av:</p><ul id="influences"></ul>');
+			$('#authorinfluences').append('<p>Påvirket av:</p><ul id="influences"></ul>');
 			$.each(json.results.bindings, function(i, n) {
 				var item = json.results.bindings[i];
 				if (item.authorName) {
