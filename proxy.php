@@ -73,7 +73,8 @@ SELECT ?title WHERE {
 		$sparql = '
 select distinct * where {
 <' . $_GET["who"] . '> dbpprop:influenced ?author .
-?author foaf:name ?authorName .
+?author rdfs:label ?authorLabel .
+filter langMatches(lang(?authorLabel), "nn")
 }';
 
 		$url = 'http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&should-sponge=&query=' . urlencode($sparql) . '&format=' . urlencode('application/sparql-results+json');
@@ -83,7 +84,8 @@ select distinct * where {
 		$sparql = '
 select distinct * where {
 <' . $_GET["who"] . '> dbpprop:influences ?author .
-?author foaf:name ?authorName .
+?author rdfs:label ?authorLabel .
+filter langMatches(lang(?authorLabel), "nn")
 }';
 
 		$url = 'http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&should-sponge=&query=' . urlencode($sparql) . '&format=' . urlencode('application/sparql-results+json');

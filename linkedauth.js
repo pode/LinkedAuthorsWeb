@@ -493,8 +493,8 @@ function getDbpediaData(dbpediaid) {
 			$('#authorinfluenced').append('<p>Påvirket:</p><ul id="influenced"></ul>');
 			$.each(json.results.bindings, function(i, n) {
 				var item = json.results.bindings[i];
-				if (item.authorName) {
-					$('#influenced').append('<li>' + item.authorName.value + '</li>');
+				if (item.authorLabel) {
+					$('#influenced').append('<li>' + item.authorLabel.value + '</li>');
 				}
 			});
 		}
@@ -506,8 +506,8 @@ function getDbpediaData(dbpediaid) {
 			$('#authorinfluences').append('<p>Påvirket av:</p><ul id="influences"></ul>');
 			$.each(json.results.bindings, function(i, n) {
 				var item = json.results.bindings[i];
-				if (item.authorName) {
-					$('#influences').append('<li>' + item.authorName.value + '</li>');
+				if (item.authorLabel) {
+					$('#influences').append('<li>' + item.authorLabel.value + '</li>');
 				}
 			});
 		}
