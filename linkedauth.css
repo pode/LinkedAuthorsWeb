@@ -25,6 +25,9 @@ along with "Podes LinkedAuthorsWeb". If not, see <http://www.gnu.org/licenses/&g
 .expression {
   cursor: pointer;	
 }
+.languageuri {
+  display: none;	
+}
 .manifestation {
   cursor: default;	
 }
