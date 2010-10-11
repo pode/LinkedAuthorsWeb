@@ -128,15 +128,18 @@ function showExpressions(elemid, workuri) {
 	// Check to see if this work already has (hidden) children attached, if so show them
 	if ($('#' + elemid).siblings().length > 0) {
 		
-		// Do nothing if the clicked work already has visible children
+		// Hide the children if the clicked work already has visible children
 		if ($('#' + elemid).siblings('ul').is(":visible")) {
-			return;
+			// alert('ouch');
+			$('.work').siblings().hide();
+		} else {
+			// Hide all "open" works
+			// alert('gjemmer alle');
+			$('.work').siblings().hide();
+			// Show this one
+			// alert('viser 1');
+			$('#' + elemid).siblings().show();
 		}
-		
-		// Hide all "open" works
-		$('.work').siblings().hide();
-		// Show this one
-		$('#' + elemid).siblings().show();
 		
 	} else {
 
