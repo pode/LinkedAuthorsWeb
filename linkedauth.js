@@ -432,8 +432,10 @@ function getDbpediaData(dbpediaid) {
 					$('#authorfactlist').append('<li>Fødselsnavn: ' + item.birthName.value + '</li>');
 				}
 				if (item.birthDate) {
-					var birthDate = new Date(item.birthDate.value);
-					$('#authorfactlist').append('<li>Født: ' + birthDate.toLocaleDateString() + '</li>');
+					var year  = item.birthDate.value.substring(0,4);
+					var month = item.birthDate.value.substring(5,7);
+					var day   = item.birthDate.value.substring(8,10);
+					$('#authorfactlist').append('<li>Født: ' + day + '.' + month + '.' + year + '</li>');
 				}
 				if (item.birthPlaceName) {
 					$('#authorfactlist').append('<li>Fødselssted: <span id="birthPlace" class="uri">' + item.birthPlaceName.value + '</span></li>');
@@ -442,8 +444,10 @@ function getDbpediaData(dbpediaid) {
 					$('#authorfactlist').append('<li>Fødselssted: <span id="birthPlace" class="uri">' + name + '</span></li>');
 				}
 				if (item.deathDate) {
-					var deathDate = new Date(item.deathDate.value);
-					$('#authorfactlist').append('<li>Død: ' + deathDate.toLocaleDateString() + '</li>');
+					var year  = item.birthDate.value.substring(0,4);
+					var month = item.birthDate.value.substring(5,7);
+					var day   = item.birthDate.value.substring(8,10);
+					$('#authorfactlist').append('<li>Død: ' + day + '.' + month + '.' + year + '</li>');
 				}
 				if (item.deathPlaceName) {
 					$('#authorfactlist').append('<li>Dødssted: <span id="deathPlace">' + item.deathPlaceName.value + '</span></li>');
@@ -452,12 +456,10 @@ function getDbpediaData(dbpediaid) {
 					$('#authorfactlist').append('<li>Dødssted: <span id="deathPlace" class="uri">' + name + '</span></li>');
 				}
 				if (item.activeYearsStartYear) {
-					var activeYearsStartYear = new Date(item.activeYearsStartYear.value);
-					$('#authorfactlist').append('<li>Karriere start: ' + activeYearsStartYear.getFullYear() + '</li>');
+					$('#authorfactlist').append('<li>Karriere start: ' + item.activeYearsStartYear.value.substring(0,4) + '</li>');
 				}
 				if (item.activeYearsEndYear) {
-					var activeYearsEndYear = new Date(item.activeYearsEndYear.value);
-					$('#authorfactlist').append('<li>Karriere slutt: ' + activeYearsEndYear.getFullYear() + '</li>');
+					$('#authorfactlist').append('<li>Karriere slutt: ' + item.activeYearsEndYear.value.substring(0,4) + '</li>');
 				}
 				if (item.nationalityThumbnail) {
 					$('#authorfacts').append('<p id="nationality">Nasjonalitet:<br /> <img height="72" width="100" src="' + item.nationalityThumbnail.value + '" /></p>');
