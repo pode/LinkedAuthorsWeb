@@ -46,12 +46,14 @@ function showWorks() {
 					  var language_sparql = 'PREFIX dct: <http://purl.org/dc/terms/> \n';
 		language_sparql = language_sparql + 'PREFIX frbr: <http://purl.org/vocab/frbr/core#> \n';
 		language_sparql = language_sparql + 'PREFIX person: <http://www.bibpode.no/person/> \n';
-		language_sparql = language_sparql + 'SELECT DISTINCT ?language WHERE { \n';
+		language_sparql = language_sparql + 'SELECT DISTINCT ?language ?langlabel WHERE { \n';
 		language_sparql = language_sparql + '?work a frbr:Work ; \n';
 		language_sparql = language_sparql + 'dct:title ?title ; \n';
 		language_sparql = language_sparql + 'dct:creator ' + author + ' . \n';
 		language_sparql = language_sparql + '?expression frbr:realizationOf ?work . \n';
 		language_sparql = language_sparql + '?expression dct:language ?language . \n';
+		language_sparql = language_sparql + '?language rdfs:label ?langlabel . \n';
+		language_sparql = language_sparql + 'FILTER langMatches( datatype(?langlabel), "xsd:stringno" ) \n';
 		language_sparql = language_sparql + '}';
 		var language_url = endpointprefix + escape(language_sparql) + endpointpostfix;
 		var params = { 'output': 'json' };
@@ -63,11 +65,7 @@ function showWorks() {
 			if (json.results.bindings){
 				$.each(json.results.bindings, function(i, n) {
 					var item = json.results.bindings[i];
-					if (languages[item.language.value]) {
-						$('#language_select').append('<option value="' + item.language.value + '">' + languages[item.language.value] + '</option>');
-					} else {
-						$('#language_select').append('<option value="' + item.language.value + '">' + item.language.value + '</option>');
-					}
+					$('#language_select').append('<option value="' + item.language.value + '">' + item.langlabel.value + '</option>');
 				});
 			} else {
 				alert('Something went wrong...');
