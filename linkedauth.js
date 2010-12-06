@@ -53,8 +53,8 @@ function showWorks() {
 		language_sparql = language_sparql + '?expression frbr:realizationOf ?work . \n';
 		language_sparql = language_sparql + '?expression dct:language ?language . \n';
 		language_sparql = language_sparql + '?language rdfs:label ?langlabel . \n';
-		language_sparql = language_sparql + 'FILTER langMatches( datatype(?langlabel), "xsd:stringno" ) \n';
-		language_sparql = language_sparql + '}';
+		language_sparql = language_sparql + 'FILTER regex( datatype(?langlabel), "^xsd:stringno$" ) \n';
+		language_sparql = language_sparql + '} ORDER BY ?langlabel';
 		var language_url = endpointprefix + escape(language_sparql) + endpointpostfix;
 		var params = { 'output': 'json' };
 		// Empty the list
@@ -158,6 +158,8 @@ function showExpressions(elemid, workuri) {
 		}
 		expr_sparql = expr_sparql + '?expression dct:format ?format . \n';
 		expr_sparql = expr_sparql + '?format rdfs:label ?formatlabel . \n';
+		expr_sparql = expr_sparql + '?language rdfs:label ?langlabel . \n';
+		expr_sparql = expr_sparql + 'FILTER regex( datatype(?langlabel), "^xsd:stringno$" ) \n';
 		expr_sparql = expr_sparql + '} \n';
 		
 		var expr_url = endpointprefix + escape(expr_sparql) + endpointpostfix;
