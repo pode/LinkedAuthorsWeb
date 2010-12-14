@@ -55,6 +55,22 @@ function showWorks() {
 		language_sparql = language_sparql + '?language rdfs:label ?langlabel . \n';
 		language_sparql = language_sparql + 'FILTER langMatches( lang(?langlabel), "nb" ) \n';
 		language_sparql = language_sparql + '} ORDER BY ?langlabel';
+		
+		/* Example: 
+		PREFIX dct: <http://purl.org/dc/terms/> 
+		PREFIX frbr: <http://purl.org/vocab/frbr/core#> 
+		PREFIX person: <http://www.bibpode.no/person/> 
+		SELECT DISTINCT ?language ?langlabel WHERE { 
+			?work a frbr:Work ; 
+			dct:title ?title ; 
+			dct:creator person:Hamsun_Knut . 
+			?expression frbr:realizationOf ?work . 
+			?expression dct:language ?language . 
+			?language rdfs:label ?langlabel . 
+			FILTER langMatches( lang(?langlabel), "nb" ) 
+		} ORDER BY ?langlabel
+		*/	
+		
 		var language_url = endpointprefix + escape(language_sparql) + endpointpostfix;
 		var params = { 'output': 'json' };
 		// Empty the list
@@ -151,16 +167,50 @@ function showExpressions(elemid, workuri) {
 		expr_sparql = expr_sparql + 'SELECT DISTINCT * WHERE { \n';
 		expr_sparql = expr_sparql + '?expression a frbr:Expression . \n';
 		expr_sparql = expr_sparql + '?expression frbr:realizationOf <' + workuri + '> . \n';
-		if ($("#language_select option:selected").val() != '') {
-			expr_sparql = expr_sparql + '?expression dct:language <' + $("#language_select option:selected").val() + '> . \n';
-		} else {
-			expr_sparql = expr_sparql + '?expression dct:language ?language . \n';
-		}
 		expr_sparql = expr_sparql + '?expression dct:format ?format . \n';
 		expr_sparql = expr_sparql + '?format rdfs:label ?formatlabel . \n';
-		expr_sparql = expr_sparql + '?language rdfs:label ?langlabel . \n';
-		expr_sparql = expr_sparql + 'FILTER langMatches( lang(?langlabel), "nb" ) \n';
-		expr_sparql = expr_sparql + '} ORDER BY ?langlabel \n';
+		if ($("#language_select option:selected").val() != '') {
+			expr_sparql = expr_sparql + '?expression dct:language <' + $("#language_select option:selected").val() + '> . \n';
+			expr_sparql = expr_sparql + '} \n';
+		} else {
+			expr_sparql = expr_sparql + '?expression dct:language ?language . \n';
+			expr_sparql = expr_sparql + '?language rdfs:label ?langlabel . \n';
+			expr_sparql = expr_sparql + 'FILTER langMatches( lang(?langlabel), "nb" ) \n';
+			expr_sparql = expr_sparql + '} ORDER BY ?langlabel \n';
+		}
+		
+		/* Example, language is chosen: 
+		PREFIX pode: <http://www.bibpode.no/vocabulary#> 
+		PREFIX pode_lf: <http://www.bibpode.no/lf/> 
+		PREFIX dct: <http://purl.org/dc/terms/> 
+		PREFIX frbr: <http://purl.org/vocab/frbr/core#> 
+		PREFIX person: <http://www.bibpode.no/person/> 
+		PREFIX work: <http://www.bibpode.no/work/> 
+		SELECT DISTINCT * WHERE { 
+		?expression a frbr:Expression . 
+		?expression frbr:realizationOf <http://www.bibpode.no/work/Hamsun_Knut_pan> . 
+		?expression dct:format ?format . 
+		?format rdfs:label ?formatlabel . 
+		?expression dct:language <http://lexvo.org/id/iso639-3/nob> . 
+		} 
+		
+		* Example, language is not chosen: 
+		PREFIX pode: <http://www.bibpode.no/vocabulary#> 
+		PREFIX pode_lf: <http://www.bibpode.no/lf/> 
+		PREFIX dct: <http://purl.org/dc/terms/> 
+		PREFIX frbr: <http://purl.org/vocab/frbr/core#> 
+		PREFIX person: <http://www.bibpode.no/person/> 
+		PREFIX work: <http://www.bibpode.no/work/> 
+		SELECT DISTINCT * WHERE { 
+		?expression a frbr:Expression . 
+		?expression frbr:realizationOf <http://www.bibpode.no/work/Hamsun_Knut_pan> . 
+		?expression dct:language <http://lexvo.org/id/iso639-3/est> . 
+		?expression dct:format ?format . 
+		?format rdfs:label ?formatlabel . 
+		?language rdfs:label ?langlabel . 
+		FILTER langMatches( lang(?langlabel), "nb" ) 
+		} ORDER BY ?langlabel 
+		*/
 		
 		var expr_url = endpointprefix + escape(expr_sparql) + endpointpostfix;
 		var params = { 'output': 'json' };
@@ -174,8 +224,8 @@ function showExpressions(elemid, workuri) {
 					if (expressions[item.expression.value]) {
 						// Add the formatlabel to the existing formatlabel
 						expressions[item.expression.value].formatlabel.value = expressions[item.expression.value].formatlabel.value + ', ' + item.formatlabel.value;
-						// If format has been sasved as http://www.bibpode.no/ff/di, replace it with a new URI
-						if (expressions[item.expression.value].format.value && expressions[item.expression.value].format.value == 'http://www.bibpode.no/ff/di') {
+						// If format has been sasved as http://www.bibpode.no/physicalFormat/di, replace it with a new URI
+						if (expressions[item.expression.value].format.value && expressions[item.expression.value].format.value == 'http://www.bibpode.no/physicalFormat/di') {
 							expressions[item.expression.value].format.value = item.format.value;
 						}
 					} else {
