@@ -22,7 +22,7 @@ along with "Podes LinkedAuthorsWeb". If not, see <http://www.gnu.org/licenses/&g
 var endpointprefix = 'http://bibpode.no/rdfstore/endpoint.php?query=';
 var endpointpostfix = '&jsonp=?';
 
-var languages = new Array();
+// var languages = new Array();
 
 $(document).ready(function() {
 
@@ -53,7 +53,7 @@ function showWorks() {
 		language_sparql = language_sparql + '?expression frbr:realizationOf ?work . \n';
 		language_sparql = language_sparql + '?expression dct:language ?language . \n';
 		language_sparql = language_sparql + '?language rdfs:label ?langlabel . \n';
-		language_sparql = language_sparql + 'FILTER regex( datatype(?langlabel), "^xsd:stringno$" ) \n';
+		language_sparql = language_sparql + 'FILTER langMatches( lang(?langlabel), "nb" ) \n';
 		language_sparql = language_sparql + '} ORDER BY ?langlabel';
 		var language_url = endpointprefix + escape(language_sparql) + endpointpostfix;
 		var params = { 'output': 'json' };
@@ -159,8 +159,8 @@ function showExpressions(elemid, workuri) {
 		expr_sparql = expr_sparql + '?expression dct:format ?format . \n';
 		expr_sparql = expr_sparql + '?format rdfs:label ?formatlabel . \n';
 		expr_sparql = expr_sparql + '?language rdfs:label ?langlabel . \n';
-		expr_sparql = expr_sparql + 'FILTER regex( datatype(?langlabel), "^xsd:stringno$" ) \n';
-		expr_sparql = expr_sparql + '} \n';
+		expr_sparql = expr_sparql + 'FILTER langMatches( lang(?langlabel), "nb" ) \n';
+		expr_sparql = expr_sparql + '} ORDER BY ?langlabel \n';
 		
 		var expr_url = endpointprefix + escape(expr_sparql) + endpointpostfix;
 		var params = { 'output': 'json' };
@@ -195,13 +195,9 @@ function showExpressions(elemid, workuri) {
 					}
 					out = out + '\', \'' + item.format.value + '\');">';
 					out = out + '<span class="format">' + item.formatlabel.value + '</span>';
-					if (item.language) {
+					if (item.langlabel) {
 						out = out + ' på ';
-						if (languages[item.language.value]) {
-							out = out + '<span class="language">' + languages[item.language.value] + '</span>';
-						} else {
-							out = out + '<span class="language languageuri" id="' + idattribute + 'language">' + item.language.value + '</span>';
-						}
+						out = out + '<span class="language">' + item.langlabel.value.toLowerCase() + '</span>';
 					}
 					out = out + '</span></li>';
 					i++;
@@ -213,10 +209,10 @@ function showExpressions(elemid, workuri) {
 				$('#' + elemid).after(out);
 
 			 	// Turn URIs into labels
-				$('.languageuri').each(function(index) {
-					// alert($(this).attr('id'));
-			   		setLanguageLabels($(this).attr('id'), $(this).text());
-				});			
+				// $('.languageuri').each(function(index) {
+				// 	// alert($(this).attr('id'));
+			   	// 	setLanguageLabels($(this).attr('id'), $(this).text());
+				// });			
 				
 			} else {
 				alert('Something went wrong...');	
@@ -264,6 +260,7 @@ OPTIONAL { ?part dct:subtitle ?subtitle . }
 	}	
 }
 
+/*
 function setLanguageLabels(id, uri){
 	
 	var url = 'proxy.php?label=nb&lexvo=' + uri;
@@ -283,6 +280,7 @@ function setLanguageLabels(id, uri){
  	});
 
 }
+*/
 
 function showManifestations(elemid, workuri, languageuri, formaturi) {
 	
