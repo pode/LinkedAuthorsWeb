@@ -204,7 +204,7 @@ function showExpressions(elemid, workuri) {
 		SELECT DISTINCT * WHERE { 
 		?expression a frbr:Expression . 
 		?expression frbr:realizationOf <http://www.bibpode.no/work/Hamsun_Knut_pan> . 
-		?expression dct:language <http://lexvo.org/id/iso639-3/est> . 
+		?expression dct:language ?language . 
 		?expression dct:format ?format . 
 		?format rdfs:label ?formatlabel . 
 		?language rdfs:label ?langlabel . 
