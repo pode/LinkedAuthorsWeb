@@ -21,36 +21,8 @@ along with "Podes LinkedAuthorsWeb". If not, see <http://www.gnu.org/licenses/&g
 
 */
 
-// Fetch language data from Lexvo
-if (!empty($_GET['lexvo']) && !empty($_GET['label'])) {
-	
-	if (preg_match('/^http:\/\/lexvo.org\/id\/iso639-3\/[a-z]{2,3}$/', $_GET['lexvo'])) {
-		$url = $_GET['lexvo'];
-		// We need to massage the URL to get it in a format Lexvo likes
-		$url = preg_replace('/\/id\//', '/data/', $url);
-		$url = preg_replace('/lexvo/', 'www.lexvo', $url);
-		
-		// create curl resource
-		$ch = curl_init($url);
-		curl_setopt($ch, CURLOPT_HEADER, true);
-		//return the transfer as a string
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array (
-         	"Accept: application/rdf+xml"
-    	));
-    	curl_setopt($ch, CURLOPT_FAILONERROR, true);
-		// Get the contents of the page
-		$rdf = curl_exec($ch);
-		// close curl resource to free up system resources
-		curl_close($ch); 
-		
-		preg_match('/' . $_GET['label'] . '">(.*)</', $rdf, $match);
-		echo(json_encode(array('label' => $match[1])));
-		exit;
-	}
-	
 // A simple proxy for non-JSONP sources
-} elseif (!empty($_GET['what']) && !empty($_GET['who'])) {
+if (!empty($_GET['what']) && !empty($_GET['who'])) {
 
 
 	$url = '';
