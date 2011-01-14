@@ -495,9 +495,9 @@ function getDbpediaData(dbpediaid) {
 					$('#authorfactlist').append('<li>Fødselssted: <span id="birthPlace" class="uri">' + name + '</span></li>');
 				}
 				if (item.deathDate) {
-					var year  = item.birthDate.value.substring(0,4);
-					var month = item.birthDate.value.substring(5,7);
-					var day   = item.birthDate.value.substring(8,10);
+					var year  = item.deathDate.value.substring(0,4);
+					var month = item.deathDate.value.substring(5,7);
+					var day   = item.deathDate.value.substring(8,10);
 					$('#authorfactlist').append('<li>Død: ' + day + '.' + month + '.' + year + '</li>');
 				}
 				if (item.deathPlaceName) {
