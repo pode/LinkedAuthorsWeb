@@ -64,7 +64,7 @@ select distinct * where {
 SELECT DISTINCT * WHERE {
 <' . $_GET['who'] . '> foaf:page ?page ;
 dbpedia-owl:abstract ?abstract .
-filter langMatches(lang(?abstract), "nn")
+filter langMatches(lang(?abstract), "no")
 }';
 
 		$url = 'http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&should-sponge=&query=' . urlencode($sparql) . '&format=' . urlencode('application/sparql-results+json');
