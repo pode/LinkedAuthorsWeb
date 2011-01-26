@@ -45,8 +45,6 @@ SELECT ?title WHERE {
 		$sparql = '
 select distinct * where {
 <' . $_GET["who"] . '> dbpprop:influenced ?author .
-?author rdfs:label ?authorLabel .
-filter langMatches(lang(?authorLabel), "nn")
 }';
 
 		$url = 'http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&should-sponge=&query=' . urlencode($sparql) . '&format=' . urlencode('application/sparql-results+json');
@@ -56,8 +54,6 @@ filter langMatches(lang(?authorLabel), "nn")
 		$sparql = '
 select distinct * where {
 <' . $_GET["who"] . '> dbpprop:influences ?author .
-?author rdfs:label ?authorLabel .
-filter langMatches(lang(?authorLabel), "nn")
 }';
 
 		$url = 'http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&should-sponge=&query=' . urlencode($sparql) . '&format=' . urlencode('application/sparql-results+json');
@@ -77,34 +73,45 @@ filter langMatches(lang(?abstract), "nn")
 		// urlencode($_GET['who'])
 		
 		$sparql = '
-SELECT DISTINCT * WHERE {
-<' . $_GET['who'] . '> dbpedia-owl:thumbnail ?thumbnail 
-OPTIONAL { <' . $_GET['who'] . '> dbpprop:name ?name } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:activeYearsEndYear ?activeYearsEndYear } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:activeYearsStartYear ?activeYearsStartYear } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:birthDate ?birthDate } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:birthName ?birthName } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:birthPlace ?birthPlace } .
-OPTIONAL { ?birthPlace dbpprop:name ?birthPlaceName } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:deathDate ?deathDate } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:deathPlace ?deathPlace } .
-OPTIONAL { ?deathPlace dbpprop:name ?deathPlaceName } .
-OPTIONAL { <' . $_GET['who'] . '> dbpedia-owl:nationality ?nationality } .
-OPTIONAL { ?nationality dbpedia-owl:thumbnail ?nationalityThumbnail } .
-OPTIONAL { ?nationality dbpprop:nativeName ?nationalityLabel } .
+PREFIX dbpediaowl: <http://dbpedia.org/ontology/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX dbpprop: <http://dbpedia.org/property/>
+SELECT DISTINCT ?thumbnail,?activeYearsEndYear,?activeYearsStartYear,?birthDate,?birthName,?birthPlace,?birthPlaceName,?deathDate,?deathPlace,?deathPlaceName,?nationality,?nationalityThumbnail WHERE {
+<' . $_GET['who'] . '> dbpprop:name ?name  .
+OPTIONAL { <' . $_GET['who'] . '> dbpediaowl:activeYearsEndYear ?activeYearsEndYear } .
+OPTIONAL { <' . $_GET['who'] . '> dbpediaowl:activeYearsStartYear ?activeYearsStartYear } .
+OPTIONAL { <' . $_GET['who'] . '> dbpediaowl:birthDate ?birthDate } .
+OPTIONAL { <' . $_GET['who'] . '> dbpediaowl:birthName ?birthName } .
+OPTIONAL { <' . $_GET['who'] . '> dbpediaowl:birthPlace ?birthPlace .
+?birthPlace dbpprop:name ?birthPlaceName } .
+OPTIONAL { <' . $_GET['who'] . '> dbpediaowl:deathDate ?deathDate } .
+OPTIONAL { <' . $_GET['who'] . '> dbpediaowl:deathPlace ?deathPlace .
+?deathPlace dbpprop:name ?deathPlaceName } .
+OPTIONAL { <' . $_GET['who'] . '> dbpediaowl:nationality ?nationality .
+?nationality dbpediaowl:thumbnail ?nationalityThumbnail } .
+ <' . $_GET['who'] . '> dbpedia-owl:thumbnail ?thumbnail .
+
 }';
 		
 /* Example: 
-SELECT DISTINCT * WHERE {
-<' . urlencode($_GET['who']) . '> dbpedia-owl:thumbnail ?thumbnail 
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:activeYearsEndYear ?activeYearsEndYear } .
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:activeYearsStartYear ?activeYearsStartYear } .
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:birthDate ?birthDate } .
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:birthName ?birthName } .
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:birthPlace ?birthPlace } .
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:deathDate ?deathDate } .
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:deathPlace ?deathPlace } .
-OPTIONAL { <' . urlencode($_GET['who']) . '> dbpedia-owl:nationality ?nationality } .
+PREFIX dbpediaowl: <http://dbpedia.org/ontology/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX dbpprop: <http://dbpedia.org/property/>
+SELECT DISTINCT ?thumbnail,?activeYearsEndYear,?activeYearsStartYear,?birthDate,?birthName,?birthPlace,?birthPlaceName,?deathDate,?deathPlace,?deathPlaceName,?nationality,?nationalityThumbnail WHERE {
+<http://dbpedia.org/resource/Knut_Hamsun> dbpprop:name ?name  .
+OPTIONAL { <http://dbpedia.org/resource/Knut_Hamsun> dbpediaowl:activeYearsEndYear ?activeYearsEndYear } .
+OPTIONAL { <http://dbpedia.org/resource/Knut_Hamsun> dbpediaowl:activeYearsStartYear ?activeYearsStartYear } .
+OPTIONAL { <http://dbpedia.org/resource/Knut_Hamsun> dbpediaowl:birthDate ?birthDate } .
+OPTIONAL { <http://dbpedia.org/resource/Knut_Hamsun> dbpediaowl:birthName ?birthName } .
+OPTIONAL { <http://dbpedia.org/resource/Knut_Hamsun> dbpediaowl:birthPlace ?birthPlace .
+?birthPlace dbpprop:name ?birthPlaceName } .
+OPTIONAL { <http://dbpedia.org/resource/Knut_Hamsun> dbpediaowl:deathDate ?deathDate } .
+OPTIONAL { <http://dbpedia.org/resource/Knut_Hamsun> dbpediaowl:deathPlace ?deathPlace .
+?deathPlace dbpprop:name ?deathPlaceName } .
+OPTIONAL { <http://dbpedia.org/resource/Knut_Hamsun> dbpediaowl:nationality ?nationality .
+?nationality dbpediaowl:thumbnail ?nationalityThumbnail } .
+ <http://dbpedia.org/resource/Knut_Hamsun> dbpedia-owl:thumbnail ?thumbnail .
+
 }
 */
 		$url = 'http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org&should-sponge=&query=' . urlencode($sparql) . '&format=' . urlencode('application/sparql-results+json');
